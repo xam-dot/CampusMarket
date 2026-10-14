@@ -523,3 +523,43 @@ body {
   font-size: 13px;
   color: #65676b;
 }
+/* ---------- MOBILE FIX: stop the page sliding sideways ---------- */
+
+/* Safety net: the page can never scroll left/right */
+html {
+  overflow-x: hidden;
+}
+
+/* Tighter top bar so everything fits on small phones */
+.topbar {
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+/* Smaller title that never gets squashed */
+.topbar h1 {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+/* The search box is allowed to shrink (min-width: 0 is the key line).
+   Without it, inputs refuse to get narrower than their default size. */
+#searchBox {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Login/Logout keeps its size and stays fully visible */
+.auth-link {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+/* Hides the grey scrollbar under the category pills
+   (they still scroll sideways when you swipe them) */
+.pills {
+  scrollbar-width: none;
+}
+.pills::-webkit-scrollbar {
+  display: none;
+}
