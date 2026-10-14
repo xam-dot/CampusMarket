@@ -1,0 +1,525 @@
+/* Removes default browser spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Padding stays inside the width */
+}
+
+/* Whole page */
+body {
+  font-family: Arial, sans-serif;
+  background: white;
+  color: #1c1e21;
+  padding-bottom: 70px;     /* Space so the bottom bar doesn't cover content */
+  max-width: 1000px;        /* Keeps it neat on a wide laptop screen */
+  margin: 0 auto;           /* Centers the page */
+}
+
+/* TOP BAR */
+.topbar {
+  position: sticky;         /* Sticks to the top while scrolling */
+  top: 0;
+  background: white;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #ddd;
+  z-index: 10;              /* Keeps it above the product cards */
+}
+
+.topbar h1 {
+  font-size: 20px;
+  white-space: nowrap;      /* Title never breaks onto two lines */
+}
+
+/* Search box fills the remaining space */
+#searchBox {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 20px;
+  background: #f0f2f5;      /* Light grey like Facebook */
+  font-size: 14px;
+}
+
+/* CATEGORY PILLS */
+.pills {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;         /* Scrolls sideways on small screens */
+}
+
+.pill {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background: #e4e6eb;      /* Grey pill */
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;      /* Keeps text on one line */
+  cursor: pointer;
+}
+
+/* The selected pill turns orange */
+.pill.active {
+  background: #ff6a3d;
+  color: white;
+}
+
+/* SECTION TITLE ("Today's picks" + location) */
+.section-title {
+  display: flex;
+  justify-content: space-between;  /* Heading left, location right */
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.section-title h2 {
+  font-size: 18px;
+}
+
+.location {
+  color: #ff6a3d;
+  font-size: 14px;
+}
+
+/* PRODUCT GRID */
+#productGrid {
+  display: grid;
+  /* Fits as many columns (min 160px) as the screen allows: 2 on phone */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 4px;                 /* Thin gaps like Marketplace */
+}
+
+/* One product card */
+.card {
+  text-decoration: none;    /* Removes the link underline */
+  color: inherit;           /* Keeps normal text color, not link blue */
+}
+
+/* The photo area: a perfect square */
+.card-img {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;          /* Size of the sample emoji */
+  background-size: cover;   /* Real photos will fill the square */
+  background-position: center;
+}
+
+/* "ZMW60 · Title" line, cut off with "..." if too long */
+.card-title {
+  padding: 8px 10px 14px;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* BOTTOM NAVIGATION BAR */
+.bottom-nav {
+  position: fixed;          /* Always stays at the bottom of the screen */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 10;
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;   /* Icon on top, label below */
+  align-items: center;
+  text-decoration: none;
+  color: #65676b;
+  font-size: 22px;
+}
+
+.bottom-nav a span {
+  font-size: 12px;
+}
+
+/* Current page is orange */
+.bottom-nav a.active {
+  color: #ff6a3d;
+}
+/* Message shown when search finds nothing */
+.empty {
+  grid-column: 1 / -1;      /* Stretches across the full grid width */
+  text-align: center;
+  color: #65676b;
+  padding: 40px 16px;
+}
+
+/* Hides the popup. Writing ".modal.hidden" makes this rule stronger
+   than the ".modal" rule below, so it wins and the popup really hides. */
+.modal.hidden {
+  display: none;
+}
+
+/* Dark see-through background that covers the whole screen */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;        /* Popup slides in from the bottom on phones */
+  justify-content: center;
+  z-index: 100;                 /* Above everything else */
+}
+
+/* The white popup box */
+.modal-box {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px 16px 0 0; /* Rounded top corners only */
+  padding: 16px;
+  position: relative;           /* Lets the close button sit in the corner */
+}
+
+/* Close button */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #e4e6eb;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Big picture area at the top of the popup */
+.modal-img {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  margin-bottom: 12px;
+}
+
+.modal-price {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.modal-category {
+  color: #65676b;
+  margin: 4px 0 16px;
+  font-size: 14px;
+}
+
+/* Green WhatsApp button */
+.whatsapp-btn {
+  display: block;
+  text-align: center;
+  background: #25d366;          /* WhatsApp green */
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+/* Cards show a hand cursor so people know they are tappable */
+.card {
+  cursor: pointer;
+}
+
+/* ---------- LOGIN / SIGNUP PAGE ---------- */
+
+/* Makes the hidden forms actually hide */
+.auth-form.hidden {
+  display: none;
+}
+
+.back-link {
+  text-decoration: none;
+  color: #ff6a3d;
+  font-weight: bold;
+}
+
+/* Centered area for the forms */
+.auth-box {
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 0 16px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;   /* Stacks the inputs vertically */
+  gap: 12px;
+}
+
+.auth-form input {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+/* Big orange button */
+.auth-btn {
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #ff6a3d;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.auth-link-small, .auth-switch a {
+  color: #ff6a3d;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 14px;
+  color: #65676b;
+}
+
+/* Message box: red for errors, green for success */
+.auth-message {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.auth-message.error   { background: #fde8e8; color: #b00020; }
+.auth-message.success { background: #e3f6ea; color: #1b7a3d; }
+.auth-message.hidden  { display: none; }
+/* Login/Logout link in the top bar */
+.auth-link {
+  color: #ff6a3d;
+  font-weight: bold;
+  text-decoration: none;
+  white-space: nowrap;   /* keeps the word on one line */
+}
+
+
+/* ---------- SELL PAGE ---------- */
+
+/* Dropdown and text area look like the other inputs */
+.auth-form select,
+.auth-form textarea {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+  background: white;
+}
+
+/* Small grey label above each box */
+.field-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #65676b;
+  margin-bottom: -6px;   /* pulls the label closer to its box */
+}
+
+/* The real file input is hidden; this big dashed button replaces it */
+.hidden-input {
+  display: none;
+}
+.photo-picker {
+  display: block;
+  text-align: center;
+  padding: 18px;
+  border: 2px dashed #ff6a3d;
+  border-radius: 10px;
+  color: #ff6a3d;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Row of photo previews */
+.photo-preview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.preview-item {
+  position: relative;     /* lets the tags and ✕ sit in the corners */
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* fills the square without stretching */
+}
+.preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  cursor: pointer;
+}
+.cover-tag {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: #ff6a3d;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* "Save this number" tick box row */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #65676b;
+}
+.check-row input {
+  padding: 0;
+  width: auto;
+}
+
+
+/* ---------- REAL PHOTOS ---------- */
+
+/* Photos fill the square card without stretching */
+.card-img { overflow: hidden; }
+.card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* crops the edges a little instead of squashing */
+}
+
+/* Popup: tall photos or long descriptions can scroll */
+.modal-box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-img { overflow: hidden; }
+.modal-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Row of small photos under the big one */
+.modal-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.modal-thumbs:empty { display: none; }  /* no row if there is only 1 photo */
+.thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid #e4e6eb;
+}
+
+/* Description text */
+.modal-description {
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;   /* keeps the seller's line breaks */
+}
+.modal-description:empty { display: none; }
+
+
+
+/* ---------- MY LISTINGS PAGE ---------- */
+.my-list {
+  padding: 8px 16px;
+}
+
+/* One row per listing: photo on the left, details on the right */
+.my-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.my-thumb {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;          /* never squash the photo */
+  border-radius: 10px;
+  background: #e8e8e8;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+}
+.my-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-info { flex: 1; min-width: 0; }
+.my-title { font-weight: bold; font-size: 15px; }
+.my-price { color: #65676b; margin: 2px 0 8px; font-size: 14px; }
+
+/* Grey "Sold" tag */
+.badge-sold {
+  background: #65676b;
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+/* Small buttons under each listing */
+.my-actions {
+  display: flex;
+  flex-wrap: wrap;         /* wrap onto a second line on small phones */
+  gap: 6px;
+}
+.mini-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 14px;
+  background: #e4e6eb;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.mini-btn.danger { background: #fde8e8; color: #b00020; }
+
+.edit-note {
+  font-size: 13px;
+  color: #65676b;
+}

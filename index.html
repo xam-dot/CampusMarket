@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Tells the browser this is a modern HTML page -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Makes the page fit phone screens properly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusMarket - UNZA</title>
+  <!-- Connects our styling file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TOP BAR: stays at the top while you scroll -->
+    <header class="topbar">
+    <h1>Marketplace</h1>
+    <!-- Search box (we make it work in Step 3) -->
+    <input type="text" id="searchBox" placeholder="Search CampusMarket">
+    <!-- NEW: says "Login", or "Logout" if someone is logged in (set by app.js) -->
+    <a href="auth.html" id="authLink" class="auth-link">Login</a>
+  </header>
+
+  <!-- CATEGORY PILLS: round buttons that scroll sideways -->
+    <!-- CATEGORY PILLS: round buttons that scroll sideways -->
+  <nav class="pills">
+    <button class="pill active" data-category="all">All</button>
+    <button class="pill" data-category="books">Books</button>
+    <button class="pill" data-category="electronics">Electronics</button>
+    <button class="pill" data-category="clothes">Clothes</button>
+    <!-- NEW: makeup, perfumes, wigs, hair extensions etc. -->
+    <button class="pill" data-category="beauty">Beauty & Personal Care</button>
+    <!-- NEW: graphic design, printing, salon, barber etc. -->
+    <button class="pill" data-category="services">Student Services</button>
+    <button class="pill" data-category="other">Other</button>
+  </nav>
+
+  <!-- SECTION TITLE: heading on the left, location on the right -->
+  <div class="section-title">
+    <h2>Today's picks</h2>
+    <span class="location">📍 UNZA, Lusaka</span>
+  </div>
+
+  <!-- PRODUCT GRID: 2 columns on phone, more on a laptop -->
+  <main id="productGrid"></main>
+
+  <!-- BOTTOM BAR: always visible so navigation is easy -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="active">🏠<span>Home</span></a>
+    <a href="sell.html" class="sell-btn">➕<span>Sell</span></a>
+    <a href="my-listings.html">📋<span>My Listings</span></a>
+  </nav>
+
+
+    <!-- POPUP: hidden until someone taps a product card -->
+    <!-- POPUP: hidden until someone taps a product card -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <!-- Close button (top right) -->
+      <button id="closeModal" class="close-btn">✕</button>
+
+      <!-- Big photo -->
+      <div id="modalImg" class="modal-img"></div>
+      <!-- NEW: small photos to tap and switch the big one -->
+      <div id="modalThumbs" class="modal-thumbs"></div>
+
+      <p id="modalPrice" class="modal-price"></p>
+      <h3 id="modalTitle"></h3>
+      <p id="modalCategory" class="modal-category"></p>
+      <!-- NEW: the seller's description -->
+      <p id="modalDescription" class="modal-description"></p>
+
+      <!-- WhatsApp button: its link is built by JavaScript -->
+      <a id="whatsappBtn" class="whatsapp-btn" href="#" target="_blank">
+        Chat with seller on WhatsApp
+      </a>
+    </div>
+  </div>
+    <!-- 1st: the Supabase tool from the internet -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2nd: our shared connection (needs the tool above) -->
+  <script src="config.js"></script>
+  <!-- 3rd: our marketplace code (needs the connection above) -->
+  <script src="app.js"></script>
+</body>
+</html>

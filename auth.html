@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CampusMarket</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar with a link back to the marketplace -->
+  <header class="topbar">
+    <a href="index.html" class="back-link">← Back</a>
+    <h1>CampusMarket</h1>
+  </header>
+
+  <div class="auth-box">
+
+    <!-- Shows success or error messages (hidden until needed) -->
+    <p id="authMessage" class="auth-message hidden"></p>
+
+    <!-- FORM 1: LOG IN (visible at first) -->
+    <form id="loginView" class="auth-form">
+      <h2>Log in</h2>
+            <!-- Accepts either an email or a phone number -->
+      <input type="text" id="loginEmail" placeholder="Email or phone number" required autocomplete="username">
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit" class="auth-btn">Log in</button>
+      <a href="#" id="showForgot" class="auth-link-small">Forgot password?</a>
+      <p class="auth-switch">New here? <a href="#" id="showSignup">Create account</a></p>
+    </form>
+
+    <!-- FORM 2: SIGN UP (hidden at first) -->
+    <form id="signupView" class="auth-form hidden">
+      <h2>Create account</h2>
+      <input type="text" id="signupName" placeholder="Full name" required>
+      <input type="email" id="signupEmail" placeholder="Email" required>
+      <!-- This number is for logging in. WhatsApp is asked later, when posting. -->
+      <input type="tel" id="signupPhone" placeholder="Phone number, e.g. 0971234567" required>
+      <input type="password" id="signupPassword" placeholder="Password (8+ characters)" required>
+      <button type="submit" class="auth-btn">Sign up</button>
+      <p class="auth-switch">Already have an account? <a href="#" id="showLogin1">Log in</a></p>
+    </form>
+
+    <!-- FORM 3: FORGOT PASSWORD (hidden at first) -->
+    <form id="forgotView" class="auth-form hidden">
+      <h2>Reset password</h2>
+      <p>Enter your email and we will send you a reset link.</p>
+      <input type="email" id="forgotEmail" placeholder="Email" required>
+      <button type="submit" class="auth-btn">Send reset link</button>
+      <p class="auth-switch"><a href="#" id="showLogin2">Back to log in</a></p>
+    </form>
+
+  </div>
+
+  <!-- Same three-script pattern as index.html, but with auth.js last -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
