@@ -563,3 +563,9 @@ html {
 .pills::-webkit-scrollbar {
   display: none;
 }
+
+/* The button on MY OWN listing: grey link instead of green WhatsApp */
+.whatsapp-btn.own-listing {
+  background: #e4e6eb;
+  color: #1c1e21;
+}

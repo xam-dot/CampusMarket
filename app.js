@@ -30,6 +30,8 @@ const whatsappBtn = document.getElementById("whatsappBtn");
 
 // ---------- 3. REMEMBER WHAT THE USER HAS CHOSEN ----------
 let selectedCategory = "all";
+// The id of the logged-in person (stays empty if nobody is logged in)
+let currentUserId = null;
 
 // ---------- 4. SAFETY HELPERS ----------
 // Students type the titles, so we must clean their text before putting it in
@@ -159,14 +161,27 @@ function openModal(product) {
   modalCategory.textContent = categoryNames[product.category] || "Other";
   modalDescription.textContent = product.description || "";
 
-  // The message that will be typed in WhatsApp for the buyer
-  const message = "Hi, I saw your listing on CampusMarket: " + product.title +
-                  " (ZMW" + product.price + "). Is it still available?";
+    // Is this MY OWN listing? (Its owner id matches the logged-in person.)
+  const isMine = currentUserId !== null && product.user_id === currentUserId;
 
-  // Build the WhatsApp link
-  whatsappBtn.href =
-    "https://wa.me/" + toWhatsAppNumber(product.phone) +
-    "?text=" + encodeURIComponent(message);
+  if (isMine) {
+    // My own listing: no WhatsApp button. Point to My Listings instead.
+    whatsappBtn.textContent = "This is your listing. Manage it in My Listings";
+    whatsappBtn.href = "my-listings.html";
+    whatsappBtn.removeAttribute("target");   // open in the same tab
+    whatsappBtn.classList.add("own-listing"); // grey style
+  } else {
+    // Someone else's listing: the normal WhatsApp button
+    const message = "Hi, I saw your listing on CampusMarket: " + product.title +
+                    " (ZMW" + product.price + "). Is it still available?";
+
+    whatsappBtn.textContent = "Chat with seller on WhatsApp";
+    whatsappBtn.href =
+      "https://wa.me/" + toWhatsAppNumber(product.phone) +
+      "?text=" + encodeURIComponent(message);
+    whatsappBtn.target = "_blank";             // open WhatsApp in a new tab
+    whatsappBtn.classList.remove("own-listing"); // normal green style
+  }
 
   // Show the popup
   modal.classList.remove("hidden");
@@ -229,6 +244,8 @@ async function setupAuthLink() {
   const { data } = await db.auth.getSession();
 
   if (data.session) {
+     // Remember who is logged in (used to spot my own listings)
+    currentUserId = data.session.user.id;
     authLink.textContent = "Logout";
     authLink.href = "#";
     authLink.addEventListener("click", async function (e) {
