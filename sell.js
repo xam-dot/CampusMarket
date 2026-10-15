@@ -1,19 +1,23 @@
 // ---------- SETTINGS ----------
-const MAX_PHOTOS = 4;          // most photos allowed per listing
+const MAX_PHOTOS = 4;            // most photos allowed per listing
 const BUCKET = "listing-images"; // the storage folder we made in step 7a
 
 // ---------- GRAB THE PARTS OF THE PAGE ----------
 const sellForm = document.getElementById("sellForm");
 const sellMessage = document.getElementById("sellMessage");
 const photoInput = document.getElementById("photoInput");
+const photoPicker = document.querySelector(".photo-picker");
 const photoPreview = document.getElementById("photoPreview");
 const postBtn = document.getElementById("postBtn");
 const whatsappInput = document.getElementById("whatsapp");
 const saveWhatsapp = document.getElementById("saveWhatsapp");
 
-// The photos the person has chosen so far (starts empty)
-let selectedFiles = [];
-
+// The photos chosen so far. These are ALREADY SHRUNK (small files).
+let selectedPhotos = [];
+// Temporary preview addresses (we free them when we redraw, to save memory)
+let previewUrls = [];
+// True while photos are being shrunk (posting is paused during this)
+let isPreparing = false;
 // The logged-in person (filled in when the page opens)
 let currentUser = null;
 
@@ -21,16 +25,14 @@ let currentUser = null;
 function showMessage(text, type) {
   sellMessage.textContent = text;
   sellMessage.className = "auth-message " + type;
-  // Scroll up so the person sees the message
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: "smooth" }); // scroll up so it is seen
 }
 
 // ---------- 1. ON PAGE OPEN: MAKE SURE SOMEONE IS LOGGED IN ----------
 async function startPage() {
-  // Ask Supabase: who is logged in on this browser?
   const { data } = await db.auth.getSession();
 
-  // Nobody? Send them to the login page.
+  // Nobody logged in? Send them to the login page.
   if (!data.session) {
     window.location.href = "auth.html";
     return;
@@ -49,62 +51,89 @@ async function startPage() {
   }
 }
 
-// ---------- 2. SHRINK A PHOTO BEFORE UPLOADING ----------
-// Phone photos are often 3-8 MB. This makes them about 150-400 KB.
-function compressImage(file) {
-  return new Promise(function (resolve, reject) {
+// ---------- 2. OPEN A PHOTO FILE AS A PICTURE WE CAN DRAW ----------
+async function loadPicture(file) {
+  // Modern way: lighter on memory, and it fixes sideways camera photos
+  if (window.createImageBitmap) {
+    try {
+      return await createImageBitmap(file, { imageOrientation: "from-image" });
+    } catch (e) {
+      // If that fails, we try the older way below
+    }
+  }
+
+  // Older way: load the file into an invisible <img>
+  return await new Promise(function (resolve, reject) {
     const img = new Image();
     const url = URL.createObjectURL(file);
-
     img.onload = function () {
-      const maxSize = 1000; // longest side will be at most 1000 pixels
-      let w = img.width;
-      let h = img.height;
-
-      // Scale down, keeping the same shape
-      if (w > h && w > maxSize) {
-        h = Math.round((h * maxSize) / w);
-        w = maxSize;
-      } else if (h >= w && h > maxSize) {
-        w = Math.round((w * maxSize) / h);
-        h = maxSize;
-      }
-
-      // Draw the photo smaller on an invisible canvas
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-      // Turn the canvas into a JPEG file (quality 0.8 = good and small)
-      canvas.toBlob(function (blob) {
-        URL.revokeObjectURL(url);
-        if (blob) resolve(blob);
-        else reject(new Error("Could not process a photo."));
-      }, "image/jpeg", 0.8);
+      URL.revokeObjectURL(url);
+      resolve(img);
     };
-
     img.onerror = function () {
       URL.revokeObjectURL(url);
-      reject(new Error("Could not read one of the photos. Try a JPG or PNG."));
+      reject(new Error("Could not read this photo."));
     };
-
     img.src = url;
   });
 }
 
-// ---------- 3. SHOW SMALL PREVIEWS OF CHOSEN PHOTOS ----------
-function renderPreviews() {
-  photoPreview.innerHTML = ""; // clear old previews
+// ---------- 3. SHRINK A PHOTO ----------
+// Phone photos are often 3-8 MB. This makes them about 150-400 KB.
+async function compressImage(file) {
+  const picture = await loadPicture(file);
 
-  selectedFiles.forEach(function (file, index) {
-    // One box per photo
+  // Scale down so the longest side is at most 1000 pixels
+  const maxSize = 1000;
+  let w = picture.width;
+  let h = picture.height;
+  if (w > h && w > maxSize) {
+    h = Math.round((h * maxSize) / w);
+    w = maxSize;
+  } else if (h >= w && h > maxSize) {
+    w = Math.round((w * maxSize) / h);
+    h = maxSize;
+  }
+
+  // Draw the photo smaller on an invisible canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";       // white background (for see-through PNGs)
+  ctx.fillRect(0, 0, w, h);
+  ctx.drawImage(picture, 0, 0, w, h);
+
+  // Free the big picture from memory
+  if (picture.close) picture.close();
+
+  // Turn the canvas into a small JPEG file
+  return await new Promise(function (resolve, reject) {
+    canvas.toBlob(function (blob) {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not process this photo."));
+    }, "image/jpeg", 0.8);
+  });
+}
+
+// ---------- 4. SHOW SMALL PREVIEWS OF THE CHOSEN PHOTOS ----------
+function renderPreviews() {
+  // Free the old preview addresses, then clear the boxes
+  previewUrls.forEach(function (u) {
+    URL.revokeObjectURL(u);
+  });
+  previewUrls = [];
+  photoPreview.innerHTML = "";
+
+  selectedPhotos.forEach(function (blob, index) {
     const box = document.createElement("div");
     box.className = "preview-item";
 
     // The picture itself
     const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
+    const url = URL.createObjectURL(blob);
+    previewUrls.push(url);
+    img.src = url;
     box.appendChild(img);
 
     // The first photo gets a "Cover" tag
@@ -115,14 +144,14 @@ function renderPreviews() {
       box.appendChild(tag);
     }
 
-    // A small ✕ button to remove this photo
+    // A small X button to remove this photo
     const remove = document.createElement("button");
     remove.type = "button"; // so it does not submit the form
     remove.className = "preview-remove";
     remove.textContent = "✕";
     remove.addEventListener("click", function () {
-      selectedFiles.splice(index, 1); // take it out of the list
-      renderPreviews();               // redraw
+      selectedPhotos.splice(index, 1);
+      renderPreviews();
     });
     box.appendChild(remove);
 
@@ -130,37 +159,76 @@ function renderPreviews() {
   });
 }
 
-// ---------- 4. WHEN THE PERSON CHOOSES PHOTOS ----------
-photoInput.addEventListener("change", function () {
-  // Go through each chosen file
-  Array.from(photoInput.files).forEach(function (file) {
-    // Only add if it is an image and we have room
-    if (file.type.startsWith("image/") && selectedFiles.length < MAX_PHOTOS) {
-      selectedFiles.push(file);
-    }
-  });
+// ---------- 5. WHEN THE PERSON CHOOSES PHOTOS ----------
+// We shrink each photo RIGHT AWAY, one at a time, while the phone
+// still lets us read it.
+photoInput.addEventListener("change", async function () {
+  const files = Array.from(photoInput.files);
+  if (files.length === 0) return;
 
-  if (photoInput.files.length + selectedFiles.length > MAX_PHOTOS) {
-    showMessage("You can add up to " + MAX_PHOTOS + " photos.", "error");
+  // Pause posting and show a "please wait" label on the button
+  isPreparing = true;
+  postBtn.disabled = true;
+  photoPicker.textContent = "⏳ Preparing photos...";
+
+  let failed = 0;     // photos we could not read
+  let tooMany = false; // true if the person picked more than the limit
+
+  for (const file of files) {
+    // Stop if we already have the maximum
+    if (selectedPhotos.length >= MAX_PHOTOS) {
+      tooMany = true;
+      break;
+    }
+    // Skip anything that is not an image
+    if (!file.type.startsWith("image/")) {
+      failed++;
+      continue;
+    }
+
+    try {
+      const small = await compressImage(file); // shrink it now
+      selectedPhotos.push(small);
+      renderPreviews();                        // show it straight away
+    } catch (err) {
+      console.error("Photo problem:", err);
+      failed++;
+    }
   }
 
+  // Back to normal
   photoInput.value = ""; // reset so the same photo can be picked again
-  renderPreviews();
+  photoPicker.textContent = "📷 Add photos";
+  isPreparing = false;
+  postBtn.disabled = false;
+
+  // Tell the person if anything went wrong
+  if (failed > 0) {
+    showMessage(failed + " photo(s) could not be read. Try a JPG or PNG, or take the photo again.", "error");
+  } else if (tooMany) {
+    showMessage("You can add up to " + MAX_PHOTOS + " photos.", "error");
+  }
 });
 
-// ---------- 5. WHEN THE PERSON PRESSES "POST LISTING" ----------
+// ---------- 6. WHEN THE PERSON PRESSES "POST LISTING" ----------
 sellForm.addEventListener("submit", async function (e) {
   e.preventDefault(); // stops the page from reloading
+
+  // Wait if photos are still being shrunk
+  if (isPreparing) {
+    showMessage("Photos are still being prepared. Please wait a moment.", "error");
+    return;
+  }
 
   // Read what they typed
   const title = document.getElementById("title").value.trim();
   const category = document.getElementById("category").value;
   const price = parseInt(document.getElementById("price").value, 10);
   const description = document.getElementById("description").value.trim();
-  const whatsapp = whatsappInput.value.replace(/\s/g, ""); // remove spaces
+  const whatsapp = whatsappInput.value.replace(/\s/g, "");
 
   // Check everything before uploading
-  if (selectedFiles.length === 0) {
+  if (selectedPhotos.length === 0) {
     showMessage("Please add at least one photo.", "error");
     return;
   }
@@ -186,18 +254,14 @@ sellForm.addEventListener("submit", async function (e) {
   const imageUrls = [];
 
   try {
-    // ----- Upload each photo -----
-    for (let i = 0; i < selectedFiles.length; i++) {
-      // Shrink the photo first
-      const blob = await compressImage(selectedFiles[i]);
-
-      // The file goes in a folder named after the user's id.
-      // Our storage rule only allows uploads into your OWN folder.
+    // ----- Upload each (already small) photo -----
+    for (let i = 0; i < selectedPhotos.length; i++) {
+      // Each file goes in a folder named after the user's id
       const path = currentUser.id + "/" + Date.now() + "-" + i + ".jpg";
 
       const { error: uploadError } = await db.storage
         .from(BUCKET)
-        .upload(path, blob, { contentType: "image/jpeg" });
+        .upload(path, selectedPhotos[i], { contentType: "image/jpeg" });
 
       if (uploadError) throw uploadError;
 
@@ -217,7 +281,7 @@ sellForm.addEventListener("submit", async function (e) {
       category: category,
       price: price,
       description: description,
-      phone: whatsapp,      // the "phone" column holds the WhatsApp number
+      phone: whatsapp,   // the "phone" column holds the seller's WhatsApp number
       images: imageUrls
     });
 
