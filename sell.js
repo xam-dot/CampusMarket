@@ -10,6 +10,7 @@ const photoPicker = document.querySelector(".photo-picker");
 const photoPreview = document.getElementById("photoPreview");
 const postBtn = document.getElementById("postBtn");
 const whatsappInput = document.getElementById("whatsapp");
+const sellerNameInput = document.getElementById("sellerName");
 const saveWhatsapp = document.getElementById("saveWhatsapp");
 
 // The photos chosen so far. These are ALREADY SHRUNK (small files).
@@ -42,13 +43,18 @@ async function startPage() {
   // If they saved a WhatsApp number before, fill it in automatically
   const { data: profile } = await db
     .from("profiles")
-    .select("whatsapp")
+    .select("whatsapp, full_name")
     .eq("id", currentUser.id)
     .maybeSingle();
 
   if (profile && profile.whatsapp) {
     whatsappInput.value = profile.whatsapp;
   }
+  // Prefill the display name with their signup name (they can change it)
+  if (profile && profile.full_name) {
+    sellerNameInput.value = profile.full_name;
+  }
+
 }
 
 // ---------- 2. OPEN A PHOTO FILE AS A PICTURE WE CAN DRAW ----------
@@ -226,6 +232,7 @@ sellForm.addEventListener("submit", async function (e) {
   const price = parseInt(document.getElementById("price").value, 10);
   const description = document.getElementById("description").value.trim();
   const whatsapp = whatsappInput.value.replace(/\s/g, "");
+    const sellerName = sellerNameInput.value.trim(); // the name buyers will see
 
   // Check everything before uploading
   if (selectedPhotos.length === 0) {
@@ -282,6 +289,7 @@ sellForm.addEventListener("submit", async function (e) {
       price: price,
       description: description,
       phone: whatsapp,   // the "phone" column holds the seller's WhatsApp number
+      seller_name: sellerName,
       images: imageUrls
     });
 
