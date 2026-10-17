@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seller - CampusMarket</title>
+  <title>Sell - CampusMarket</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,25 +11,68 @@
   <!-- Top bar with a link back to the marketplace -->
   <header class="topbar">
     <a href="index.html" class="back-link">← Back</a>
-    <h1>Seller</h1>
+    <h1>Sell</h1>
   </header>
 
-  <!-- seller.js fills this area with the seller's name and listings -->
-  <main id="sellerPage">
-    <p class="empty">Loading...</p>
-  </main>
+  <div class="auth-box">
 
-  <!-- Bottom navigation bar -->
-  <nav class="bottom-nav">
-    <a href="index.html">🏠<span>Home</span></a>
-    <a href="sell.html" class="sell-btn">➕<span>Sell</span></a>
-    <a href="my-listings.html">📋<span>My Listings</span></a>
-  </nav>
+    <!-- Shows success or error messages (hidden until needed) -->
+    <p id="sellMessage" class="auth-message hidden"></p>
 
-  <!-- Same pattern as the other pages: Supabase tool, connection, helpers, then this page's code -->
+    <form id="sellForm" class="auth-form">
+      <h2>Sell an item or service</h2>
+
+      <!-- PHOTOS -->
+      <label class="field-label">Photos (up to 4). The first photo is the cover.</label>
+      <!-- This label acts as a big "Add photos" button for the hidden file input -->
+      <label for="photoInput" class="photo-picker">📷 Add photos</label>
+      <input type="file" id="photoInput" accept="image/*" multiple class="hidden-input">
+      <!-- Small previews appear here after choosing photos -->
+      <div id="photoPreview" class="photo-preview"></div>
+
+      <!-- TITLE -->
+      <label class="field-label" for="title">Title</label>
+      <input type="text" id="title" placeholder="e.g. Anatomy textbook, or Barber services" maxlength="80" required>
+
+      <!-- CATEGORY -->
+      <label class="field-label" for="category">Category</label>
+      <select id="category" required>
+        <option value="">Choose a category</option>
+        <option value="books">Books</option>
+        <option value="electronics">Electronics</option>
+        <option value="clothes">Clothes</option>
+        <option value="beauty">Beauty &amp; Personal Care</option>
+        <option value="services">Student Services</option>
+        <option value="other">Other</option>
+      </select>
+
+      <!-- PRICE -->
+      <label class="field-label" for="price">Price in ZMW (for services, your starting price)</label>
+      <input type="number" id="price" placeholder="e.g. 150" min="1" step="1" required>
+
+      <!-- DESCRIPTION -->
+      <label class="field-label" for="description">Description (optional)</label>
+      <textarea id="description" rows="4" maxlength="500" placeholder="Condition, size, location, what the service includes..."></textarea>
+
+      <!-- THE NAME BUYERS WILL SEE ON YOUR LISTING AND SELLER PAGE -->
+      <label class="field-label" for="sellerName">Name buyers will see (your name or shop name)</label>
+      <input type="text" id="sellerName" placeholder="e.g. Mary's Beauty Shop" maxlength="40" required>
+
+      <!-- THE SELLER'S OWN WHATSAPP NUMBER (buyers will message this number) -->
+      <label class="field-label" for="whatsapp">Your WhatsApp number (buyers will contact you here)</label>
+      <input type="tel" id="whatsapp" placeholder="Your number, e.g. 0971234567" required>
+      <label class="check-row">
+        <input type="checkbox" id="saveWhatsapp" checked>
+        Save this number so I don't type it again
+      </label>
+
+      <button type="submit" class="auth-btn" id="postBtn">Post listing</button>
+    </form>
+
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="helpers.js"></script>
-  <script src="seller.js"></script>
+  <script src="sell.js"></script>
 </body>
 </html>
