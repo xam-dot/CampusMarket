@@ -66,7 +66,8 @@ function showStore(store, items, isOwner) {
   // The main button: the owner sees "Add a product", visitors see WhatsApp
   let mainButton;
   if (isOwner) {
-    mainButton = `<a class="store-btn" href="sell.html">+ Add a product</a>`;
+        mainButton = `<a class="store-btn" href="sell.html">+ Add a product</a>
+                  <a class="store-btn light" href="edit-store.html">✏️ Edit</a>`;
   } else {
     const message = "Hi, I found your store " + store.name + " on CampusMarket.";
     const link = "https://wa.me/" + toWhatsAppNumber(store.whatsapp) +

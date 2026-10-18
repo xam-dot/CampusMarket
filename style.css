@@ -1070,3 +1070,25 @@ body:has(.listing-page) {
   background: #f0f2f5;
   color: #65676b;
 }
+
+/* ---------- SHOW / HIDE PASSWORD ---------- */
+.password-wrap {
+  position: relative;      /* lets the button sit inside the box */
+}
+.password-wrap input {
+  width: 100%;
+  padding-right: 64px;     /* room for the button, so text never runs under it */
+}
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  padding: 0 14px;
+  border: none;
+  background: none;
+  color: #ff6a3d;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}

@@ -75,6 +75,7 @@ async function startPage() {
       <p>${escapeText(existing.name)}</p>
       <a class="auth-btn" href="store.html?name=${encodeURIComponent(existing.slug)}">View my store</a>
       <a class="auth-btn alt" href="sell.html">Add a product</a>
+      <a class="auth-btn alt" href="edit-store.html">Edit my store</a>
     `;
     return;
   }
