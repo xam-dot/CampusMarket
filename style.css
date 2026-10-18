@@ -569,3 +569,253 @@ html {
   background: #e4e6eb;
   color: #1c1e21;
 }
+
+/* ---------- PROFESSIONAL LISTING PAGE ---------- */
+
+/* Light grey page so the white cards stand out.
+   Extra bottom space so the fixed bar never covers the end. */
+.listing-page {
+  background: #f0f2f5;
+  padding-bottom: 96px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ----- Photo gallery ----- */
+.gallery {
+  position: relative;       /* lets the counter, dots and arrows sit on top */
+  background: #111;
+  aspect-ratio: 1 / 1;      /* a perfect square */
+  max-height: 70vh;
+  overflow: hidden;         /* nothing can stick out past the square */
+}
+
+/* The row of photos you swipe through */
+.gallery-track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;   /* each swipe lands neatly on a photo */
+  scrollbar-width: none;           /* hides the scrollbar */
+}
+.gallery-track::-webkit-scrollbar { display: none; }
+
+/* Every slide is exactly one screen wide */
+.gallery-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: center;
+}
+.gallery-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;      /* shows the WHOLE photo (use "cover" to fill and crop) */
+  display: block;
+}
+
+/* No photos: big emoji on a coloured square */
+.gallery-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 90px;
+}
+
+/* "1/4" counter, top right */
+.gallery-count {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* Dots at the bottom centre */
+.gallery-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+.dot.active { background: white; }
+
+/* Arrows (useful on a laptop) */
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 22px;
+  cursor: pointer;
+}
+.gallery-arrow.left { left: 8px; }
+.gallery-arrow.right { right: 8px; }
+/* Phones swipe, so hide the arrows on touch screens */
+@media (hover: none) {
+  .gallery-arrow { display: none; }
+}
+
+/* Red "SOLD" label, top left */
+.sold-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #b00020;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+/* ----- White cards ----- */
+.info-card {
+  background: white;
+  margin-top: 8px;
+  padding: 16px;
+}
+.info-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.detail-price {
+  font-size: 26px;
+  font-weight: 800;
+}
+.detail-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 4px 0 10px;
+}
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.chip {
+  background: #fff1ec;
+  color: #ff6a3d;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.posted {
+  color: #65676b;
+  font-size: 13px;
+}
+.detail-description {
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-wrap;    /* keeps the seller's line breaks */
+  color: #333;
+}
+
+/* ----- Seller card ----- */
+.seller-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.seller-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #ff6a3d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  flex-shrink: 0;           /* never squash the circle */
+}
+.seller-text { flex: 1; min-width: 0; }
+.seller-name { font-weight: bold; font-size: 15px; }
+.seller-sub { color: #65676b; font-size: 13px; }
+.seller-arrow { color: #65676b; font-size: 24px; }
+
+/* ----- Safety tip ----- */
+.safety {
+  background: #eef6ff;
+  font-size: 13px;
+  color: #33475b;
+}
+.safety p {
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* "More from this seller" gets a white background too */
+#moreArea { background: white; margin-top: 8px; padding-bottom: 8px; }
+#moreArea:empty { display: none; }
+
+/* ----- Fixed bottom bar ----- */
+.action-bar {
+  position: fixed;          /* always stays at the bottom of the screen */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-top: 1px solid #ddd;
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+.action-main {
+  flex: 1;
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 10px;
+  background: #25d366;      /* WhatsApp green */
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+}
+.action-main.manage {
+  background: #e4e6eb;
+  color: #1c1e21;
+}
+.action-sold {
+  flex: 1;
+  text-align: center;
+  padding: 14px;
+  border-radius: 10px;
+  background: #e4e6eb;
+  color: #65676b;
+  font-weight: bold;
+}
+.action-share {
+  width: 54px;
+  border: none;
+  border-radius: 10px;
+  background: #e4e6eb;
+  font-size: 20px;
+  cursor: pointer;
+}
