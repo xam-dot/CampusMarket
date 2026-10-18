@@ -819,3 +819,37 @@ html {
   font-size: 20px;
   cursor: pointer;
 }
+
+/* ---------- LISTING PAGE ON LAPTOPS AND TABLETS ---------- */
+
+/* Remove the height cap that squeezed the photo on wide screens */
+.gallery {
+  max-height: none;
+}
+
+/* On wide screens, keep the listing in a neat centred column */
+@media (min-width: 700px) {
+
+  /* The listing content: a centred column, not stretched across the screen */
+  .listing-page {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #f0f2f5;
+  }
+
+  /* A wider, shorter photo area so the photo fits on a laptop screen */
+  .gallery {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* The fixed bottom bar lines up with the column */
+  .action-bar {
+    max-width: 640px;
+  }
+}
+
+/* Light grey behind the listing page so the white cards stand out.
+   (Older browsers ignore this line, which is fine.) */
+body:has(.listing-page) {
+  background: #f0f2f5;
+}
