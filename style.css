@@ -1042,3 +1042,31 @@ body:has(.listing-page) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ---------- STORE LINKS ---------- */
+
+/* Note on the Sell page: "This product will be added to your store" */
+.store-note {
+  background: #fff1ec;
+  color: #c4411c;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* A store logo inside the round seller avatar */
+.seller-avatar {
+  overflow: hidden;
+}
+.seller-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The name box looks greyed out when it comes from the store */
+.auth-form input[readonly] {
+  background: #f0f2f5;
+  color: #65676b;
+}

@@ -8,10 +8,20 @@ const sellerId = params.get("id") || "";
 
 async function loadSeller() {
   try {
-    // A real seller id is 36 characters of letters, numbers and dashes.
-    // Anything else is rejected before we ask the database.
+    // A real seller id is 36 characters of letters, numbers and dashes
     if (!/^[0-9a-fA-F-]{36}$/.test(sellerId)) {
       sellerPage.innerHTML = '<p class="empty">This seller could not be found.</p>';
+      return;
+    }
+
+    // If this seller has a store, send visitors to the store page instead
+    const { data: store } = await db
+      .from("stores")
+      .select("slug")
+      .eq("owner_id", sellerId)
+      .maybeSingle();
+    if (store) {
+      window.location.replace("store.html?name=" + encodeURIComponent(store.slug));
       return;
     }
 
@@ -47,10 +57,9 @@ async function loadSeller() {
       <div class="listing-grid">${data.map(cardHtml).join("")}</div>
     `;
   } catch (err) {
-    // If anything unexpected fails, show what went wrong instead of "Loading..." forever
+    // Show what went wrong instead of "Loading..." forever
     console.error(err);
-    sellerPage.innerHTML = '<p class="empty"></p>';
-    sellerPage.firstChild.textContent = "Something went wrong: " + err.message;
+    sellerPage.textContent = "Something went wrong: " + err.message;
   }
 }
 

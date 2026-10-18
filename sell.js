@@ -12,6 +12,7 @@ const postBtn = document.getElementById("postBtn");
 const whatsappInput = document.getElementById("whatsapp");
 const saveWhatsapp = document.getElementById("saveWhatsapp");
 const sellerNameInput = document.getElementById("sellerName"); // the public display name box
+const storeNote = document.getElementById("storeNote");        // "added to your store" note
 
 // The photos chosen so far. These are ALREADY SHRUNK (small files).
 let selectedPhotos = [];
@@ -21,6 +22,8 @@ let previewUrls = [];
 let isPreparing = false;
 // The logged-in person (filled in when the page opens)
 let currentUser = null;
+// The person's store, if they have one (filled in when the page opens)
+let myStore = null;
 
 // ---------- SHOW A MESSAGE ("error" = red, "success" = green) ----------
 function showMessage(text, type) {
@@ -54,6 +57,22 @@ async function startPage() {
   // Prefill the display name with their signup name (they can change it)
   if (profile && profile.full_name) {
     sellerNameInput.value = profile.full_name;
+  }
+
+  // Does this person have a store? If so, products are added to it automatically.
+  const { data: store } = await db
+    .from("stores")
+    .select("id, name, slug, whatsapp")
+    .eq("owner_id", currentUser.id)
+    .maybeSingle();
+
+  if (store) {
+    myStore = store;
+    sellerNameInput.value = store.name;   // listings carry the store's name
+    sellerNameInput.readOnly = true;      // the name comes from the store
+    if (store.whatsapp) whatsappInput.value = store.whatsapp;
+    storeNote.textContent = "🏪 This product will be added to your store: " + store.name;
+    storeNote.style.display = "block";
   }
 }
 
@@ -294,6 +313,7 @@ sellForm.addEventListener("submit", async function (e) {
       description: description,
       phone: whatsapp,           // the seller's WhatsApp number
       seller_name: sellerName,   // the name buyers will see
+      store_id: myStore ? myStore.id : null,   // attach the product to the store
       images: imageUrls
     });
 
@@ -304,8 +324,10 @@ sellForm.addEventListener("submit", async function (e) {
       await db.from("profiles").update({ whatsapp: whatsapp }).eq("id", currentUser.id);
     }
 
-    // ----- Done! Go to the marketplace -----
-    window.location.href = "index.html";
+    // ----- Done! Store owners land on their store; everyone else on the marketplace -----
+    window.location.href = myStore
+      ? "store.html?name=" + encodeURIComponent(myStore.slug)
+      : "index.html";
 
   } catch (error) {
     console.error("Post failed:", error);

@@ -54,8 +54,19 @@ async function loadListing() {
     const myId = sessionData.session ? sessionData.session.user.id : null;
     const isMine = myId !== null && item.user_id === myId;
 
-    showListing(item, isMine);
-    loadMoreFromSeller(item);
+        // Does the seller have a store? If so we link to it.
+    let store = null;
+    if (item.user_id) {
+      const { data: storeData } = await db
+        .from("stores")
+        .select("name, slug, logo_url")
+        .eq("owner_id", item.user_id)
+        .maybeSingle();
+      store = storeData;
+    }
+
+    showListing(item, isMine, store);
+    loadMoreFromSeller(item, store);
   } catch (err) {
     // Show what went wrong instead of "Loading..." forever
     console.error(err);
@@ -64,7 +75,7 @@ async function loadListing() {
 }
 
 // ---------- 2. DRAW THE LISTING ----------
-function showListing(item, isMine) {
+function showListing(item, isMine, store) {
   // Put the item's name in the browser tab
   document.title = item.title + " - CampusMarket";
 
@@ -106,17 +117,28 @@ function showListing(item, isMine) {
   }
 
   // ----- Seller card (a link to their page if the listing has an owner) -----
-  const sellerName = item.seller_name || "Seller";
+   // ----- Seller card: links to the store if there is one, otherwise to the seller page -----
+  const sellerName = store ? store.name : (item.seller_name || "Seller");
+  const sellerLink = store
+    ? "store.html?name=" + encodeURIComponent(store.slug)
+    : (item.user_id ? "seller.html?id=" + encodeURIComponent(item.user_id) : "");
   const initial = escapeHtml(sellerName.trim().charAt(0).toUpperCase() || "S");
+
+  // The store's logo if it has one, otherwise a circle with the first letter
+  const avatarHtml = store && store.logo_url
+    ? `<div class="seller-avatar"><img src="${escapeHtml(store.logo_url)}" alt=""></div>`
+    : `<div class="seller-avatar">${initial}</div>`;
+
   const sellerInner = `
-    <div class="seller-avatar">${initial}</div>
+    ${avatarHtml}
     <div class="seller-text">
-      <p class="seller-name">${escapeHtml(sellerName)}</p>
-      <p class="seller-sub">${item.user_id ? "View all their items" : "Seller"}</p>
+      <p class="seller-name">${escapeHtml(sellerName)}${store ? " 🏪" : ""}</p>
+      <p class="seller-sub">${sellerLink ? (store ? "Visit store" : "View all their items") : "Seller"}</p>
     </div>
-    ${item.user_id ? '<span class="seller-arrow">›</span>' : ""}`;
-  const sellerHtml = item.user_id
-    ? `<a class="info-card seller-card" href="seller.html?id=${encodeURIComponent(item.user_id)}">${sellerInner}</a>`
+    ${sellerLink ? '<span class="seller-arrow">›</span>' : ""}`;
+
+  const sellerHtml = sellerLink
+    ? `<a class="info-card seller-card" href="${escapeHtml(sellerLink)}">${sellerInner}</a>`
     : `<div class="info-card seller-card">${sellerInner}</div>`;
 
   // ----- The main button in the bottom bar -----
@@ -226,7 +248,7 @@ async function shareListing(item) {
 }
 
 // ---------- 4. "MORE FROM THIS SELLER" ROW ----------
-async function loadMoreFromSeller(item) {
+async function loadMoreFromSeller(item, store) {
   // Listings with no owner have no seller to show
   if (!item.user_id) return;
 
@@ -243,10 +265,16 @@ async function loadMoreFromSeller(item) {
   // Nothing else to show? Leave the area empty.
   if (!data || data.length === 0) return;
 
+  // The name and the "See all" link point to the store if there is one
+  const name = store ? store.name : (item.seller_name || "this seller");
+  const seeAll = store
+    ? "store.html?name=" + encodeURIComponent(store.slug)
+    : "seller.html?id=" + encodeURIComponent(item.user_id);
+
   document.getElementById("moreArea").innerHTML = `
     <div class="more-header">
-      <h3>More from ${escapeHtml(item.seller_name || "this seller")}</h3>
-      <a href="seller.html?id=${encodeURIComponent(item.user_id)}">See all</a>
+      <h3>More from ${escapeHtml(name)}</h3>
+      <a href="${escapeHtml(seeAll)}">See all</a>
     </div>
     <div class="listing-grid">${data.map(cardHtml).join("")}</div>
   `;
