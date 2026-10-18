@@ -47,7 +47,7 @@ function cardHtml(item) {
   return `
     <a class="card" href="listing.html?id=${Number(item.id)}">
       <div class="card-img" style="background:${safeColor(item.color)}">${pictureHtml(item)}</div>
-      <p class="card-title">ZMW${Number(item.price)} · ${escapeHtml(item.title)}</p>
+            <p class="card-title">ZMW${Number(item.price).toLocaleString("en-US")} · ${escapeHtml(item.title)}</p>
     </a>
   `;
 }

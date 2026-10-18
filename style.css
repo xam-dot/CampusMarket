@@ -853,3 +853,192 @@ html {
 body:has(.listing-page) {
   background: #f0f2f5;
 }
+
+
+/* ---------- CREATE STORE PAGE ---------- */
+
+/* Round logo preview */
+.logo-img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  border: 2px solid #e4e6eb;
+}
+
+/* The "Your store link: ..." line */
+.slug-preview {
+  font-size: 13px;
+  color: #65676b;
+  word-break: break-all;   /* long links wrap instead of running off the screen */
+  margin-top: -4px;
+}
+
+/* The message shown after the store is created */
+.store-done {
+  text-align: center;
+  padding: 24px 0;
+}
+.store-done h2 { margin-bottom: 8px; }
+.store-done p { margin-bottom: 8px; color: #333; }
+.store-done .auth-btn {
+  display: block;
+  text-decoration: none;
+  margin-top: 12px;
+}
+/* A grey secondary button */
+.store-done .auth-btn.alt {
+  background: #e4e6eb;
+  color: #1c1e21;
+}
+
+
+
+/* ---------- STORE PAGE ---------- */
+
+.store-page {
+  padding-bottom: 20px;
+}
+
+/* Coloured banner across the top */
+.store-banner {
+  height: 110px;
+  background: linear-gradient(135deg, #ff6a3d, #ff9a5c);
+}
+
+/* Logo, name and details, centred under the banner */
+.store-head {
+  text-align: center;
+  padding: 0 16px 16px;
+}
+
+/* Round logo that overlaps the banner (the negative margin pulls it up) */
+.store-logo {
+  width: 88px;
+  height: 88px;
+  margin: -44px auto 10px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: #ff6a3d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  overflow: hidden;        /* keeps the picture inside the circle */
+}
+.store-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.store-name {
+  font-size: 22px;
+}
+.store-count {
+  color: #65676b;
+  font-size: 14px;
+  margin-top: 2px;
+}
+.store-about {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-top: 10px;
+  white-space: pre-wrap;   /* keeps the owner's line breaks */
+  color: #333;
+}
+
+/* Buttons under the description */
+.store-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.store-btn {
+  flex: 1;
+  display: block;
+  text-align: center;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #ff6a3d;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+.store-btn.whatsapp { background: #25d366; }   /* WhatsApp green */
+.store-btn.light {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  background: #e4e6eb;
+  color: #1c1e21;
+}
+
+/* "Products" heading above the grid */
+.store-products-title {
+  padding: 12px 16px 8px;
+  font-size: 17px;
+  border-top: 8px solid #f0f2f5;
+}
+
+/* ---------- MARKETPLACE-STYLE GRID (phones: exactly 2 columns) ---------- */
+
+.listing-grid,
+#productGrid {
+  display: grid;
+  /* Two equal columns. "minmax(0, 1fr)" lets a column shrink below its
+     text width, so a long title can never push the page wider. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;                /* thin gaps between photos, like Marketplace */
+  padding: 0;
+}
+
+/* On tablets and laptops, fit as many columns as the screen allows */
+@media (min-width: 700px) {
+  .listing-grid,
+  #productGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* One product card */
+.listing-grid .card,
+#productGrid .card {
+  display: block;
+  min-width: 0;            /* lets the card shrink to its half of the screen */
+  background: white;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Square photo that fills the card edge to edge */
+.listing-grid .card-img,
+#productGrid .card-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+.listing-grid .card-img img,
+#productGrid .card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* fills the square, cropping the edges a little */
+  display: block;
+}
+
+/* "ZMW1,000 · Title" on one line, with "..." if it is too long */
+.listing-grid .card-title,
+#productGrid .card-title {
+  padding: 10px 10px 16px;
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

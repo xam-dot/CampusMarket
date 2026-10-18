@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store - CampusMarket</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar with a link back to the marketplace -->
+  <header class="topbar">
+    <a href="index.html" class="back-link">← Back</a>
+    <h1>Store</h1>
+  </header>
+
+  <!-- store.js fills this area with the banner, logo, details and products -->
+  <main id="storePage" class="store-page">
+    <p class="empty">Loading...</p>
+  </main>
+
+  <!-- Bottom navigation bar -->
+  <nav class="bottom-nav">
+    <a href="index.html">🏠<span>Home</span></a>
+    <a href="sell.html" class="sell-btn">➕<span>Sell</span></a>
+    <a href="create-store.html">🏪<span>My Store</span></a>
+    <a href="my-listings.html">📋<span>My Listings</span></a>
+  </nav>
+
+  <!-- Supabase tool, connection, shared helpers, then this page's code (order matters) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="helpers.js"></script>
+  <script src="store.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create your store - CampusMarket</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar with a link back to the marketplace -->
+  <header class="topbar">
+    <a href="index.html" class="back-link">← Back</a>
+    <h1>Create your store</h1>
+  </header>
+
+  <div class="auth-box">
+
+    <!-- Shows success or error messages (hidden until needed) -->
+    <p id="storeMessage" class="auth-message hidden"></p>
+
+    <!-- The form -->
+    <form id="storeForm" class="auth-form">
+      <h2>Set up your store</h2>
+
+      <!-- LOGO -->
+      <label class="field-label">Store logo (optional)</label>
+      <label for="logoInput" class="photo-picker" id="logoPicker">🖼️ Add logo</label>
+      <input type="file" id="logoInput" accept="image/*" class="hidden-input">
+      <!-- A round preview of the chosen logo -->
+      <img id="logoPreview" class="logo-img" alt="Logo preview" style="display:none">
+
+      <!-- STORE NAME -->
+      <label class="field-label" for="storeName">Store name</label>
+      <input type="text" id="storeName" placeholder="e.g. Mary's Beauty Store" maxlength="40" required>
+
+      <!-- STORE LINK NAME (made from the store name, but they can change it) -->
+      <label class="field-label" for="storeSlug">Store link name</label>
+      <input type="text" id="storeSlug" placeholder="e.g. marys-beauty" maxlength="30" required>
+      <p class="slug-preview">Your store link: <span id="slugPreview"></span></p>
+
+      <!-- DESCRIPTION -->
+      <label class="field-label" for="storeDescription">About your store (optional)</label>
+      <textarea id="storeDescription" rows="4" maxlength="300" placeholder="What do you sell? Where are you based? When are you available?"></textarea>
+
+      <!-- WHATSAPP -->
+      <label class="field-label" for="storeWhatsapp">Store WhatsApp number (customers will contact you here)</label>
+      <input type="tel" id="storeWhatsapp" placeholder="e.g. 0971234567" required>
+
+      <button type="submit" class="auth-btn" id="createBtn">Create my store</button>
+    </form>
+
+    <!-- Shown after the store is created, or if you already have one -->
+    <div id="storeDone" class="store-done" style="display:none"></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="create-store.js"></script>
+</body>
+</html>

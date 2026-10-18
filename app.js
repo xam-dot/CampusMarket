@@ -61,7 +61,7 @@ function showProducts() {
       return `
         <a class="card" href="listing.html?id=${Number(product.id)}">
           <div class="card-img" style="background:${safeColor(product.color)}">${cardPicture(product)}</div>
-          <p class="card-title">ZMW${Number(product.price)} · ${escapeHtml(product.title)}</p>
+                    <p class="card-title">ZMW${Number(product.price).toLocaleString("en-US")} · ${escapeHtml(product.title)}</p>
         </a>
       `;
     })
