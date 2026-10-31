@@ -7,29 +7,38 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// ---------- 2. HELPERS FOR THE INSTALL BANNER ----------
+// ---------- 2. CLEAN UP THE OLD "HIDE FOR 14 DAYS" NOTE ----------
+// An earlier version saved this note. We no longer use it.
+try {
+  localStorage.removeItem("installBannerDismissedAt");
+} catch (e) {
+  // Storage is blocked. Nothing to do.
+}
+
+// ---------- 3. HELPERS FOR THE INSTALL BANNER ----------
 // True when the site is already running as an installed app
 const isStandalone =
   window.matchMedia("(display-mode: standalone)").matches ||
   window.navigator.standalone === true;
 
-const DISMISS_KEY = "installBannerDismissedAt"; // remembered in the browser
-const DISMISS_DAYS = 14;                        // how long to stay quiet after "✕"
+// "✕" only hides the banner for this visit (this browser tab).
+// sessionStorage is cleared when the tab is closed, so the banner
+// comes back the next time the site is opened.
+const HIDE_KEY = "installBannerHiddenThisVisit";
 
-function recentlyDismissed() {
+function hiddenThisVisit() {
   try {
-    const time = Number(localStorage.getItem(DISMISS_KEY));
-    return time && Date.now() - time < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    return sessionStorage.getItem(HIDE_KEY) === "yes";
   } catch (e) {
     return false;
   }
 }
 
-function rememberDismiss() {
+function hideForThisVisit() {
   try {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    sessionStorage.setItem(HIDE_KEY, "yes");
   } catch (e) {
-    // Storage is blocked. Nothing to do.
+    // Storage is blocked. The banner will simply show again on the next page.
   }
 }
 
@@ -64,7 +73,7 @@ function showBanner(message, buttonText, onButton) {
   close.textContent = "✕";
   close.setAttribute("aria-label", "Close");
   close.addEventListener("click", function () {
-    rememberDismiss();
+    hideForThisVisit();   // hidden for now, back on the next visit
     banner.remove();
   });
   banner.appendChild(close);
@@ -72,15 +81,15 @@ function showBanner(message, buttonText, onButton) {
   document.body.appendChild(banner);
 }
 
-// ---------- 3. ANDROID / CHROME: INSTALL BUTTON ----------
+// ---------- 4. ANDROID / CHROME: INSTALL BUTTON ----------
 let deferredPrompt = null;
 
-// Chrome fires this when the site can be installed
+// Chrome fires this ONLY when the app is not installed yet
 window.addEventListener("beforeinstallprompt", function (event) {
   event.preventDefault();      // stop Chrome's own small bar, we show ours
   deferredPrompt = event;
 
-  if (isStandalone || recentlyDismissed()) return;
+  if (isStandalone || hiddenThisVisit()) return;
 
   showBanner("Install CampusMarket on your phone", "Install", async function () {
     deferredPrompt.prompt();           // opens Chrome's install box
@@ -95,12 +104,14 @@ window.addEventListener("appinstalled", function () {
   if (banner) banner.remove();
 });
 
-// ---------- 4. IPHONE: SHOW HOW TO ADD IT ----------
+// ---------- 5. IPHONE: SHOW HOW TO ADD IT ----------
+// iPhones give websites no way to know if the app is installed,
+// so Safari visitors see this each visit. The installed app itself never shows it.
 const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const isSafari =
   /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
 
-if (isIos && isSafari && !isStandalone && !recentlyDismissed()) {
+if (isIos && isSafari && !isStandalone && !hiddenThisVisit()) {
   window.addEventListener("load", function () {
     setTimeout(function () {
       showBanner("To install: tap the Share button, then “Add to Home Screen”.", null, null);
